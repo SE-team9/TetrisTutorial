@@ -9,7 +9,7 @@ public class GameArea extends JPanel {
 	private int gridRows;
 	private int gridColumns;
 	private int gridCellSize;
-	
+	private Color[][] background;
 	private TetrisBlock block;
 	
 	public GameArea(JPanel placeholder, int columns) {
@@ -25,7 +25,7 @@ public class GameArea extends JPanel {
 		// HEIGHT divisible by grid-cell size
 		gridRows = this.getBounds().height / gridCellSize;
 		
-		spawnBlock();
+		background = new Color[gridRows][gridColumns];
 	}
 	
 	public void spawnBlock() {
@@ -33,20 +33,46 @@ public class GameArea extends JPanel {
 		block.spawn(gridColumns);
 	}
 	
-	public void moveBlockDown() {
-		// 블록이 바닥에 닿으면 정지 
-		if(checkBottom() == false) return;
+	public boolean moveBlockDown() {
+		// 블록이 바닥에 닿으면, 백그라운드 블록으로 전환 
+		if(checkBottom() == true) {
+			moveBlockToBackground();
+			return false;
+		}
 		
-		block.moveDown();
+		block.moveDown(); 
 		repaint(); // 일정한 시간 간격으로 (스레드 사용)
+		
+		return true;
+	}
+	
+	private void moveBlockToBackground() {
+		// 움직이고 있던 블록에 대한 참조
+		int[][] shape = block.getShape();
+		int h = block.getHeight();
+		int w = block.getWidth();
+		
+		int xPos = block.getX();
+		int yPos = block.getY();
+		
+		Color color = block.getColor();
+		
+		for(int r = 0; r < h; r++) {
+			for(int c = 0; c < w; c++) {
+				// 백그라운드 블록의 컬러로 설정 
+				if(shape[r][c] == 1) {
+					background[r + yPos][c + xPos] = color;
+				}
+			}
+		}
 	}
 	
 	private boolean checkBottom() {
 		if(block.getBottomEdge() == gridRows) {
-			return false;
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	private void drawBlock(Graphics g) {
@@ -57,25 +83,50 @@ public class GameArea extends JPanel {
 		
 		for(int row = 0; row < h; row++) {
 			for(int col = 0; col < w; col++) {
-				if(shape[row][col] == 1) {
-					
+				
+				if(shape[row][col] == 1) { // colored cell
 					int x = (block.getX() + col) * gridCellSize;
 					int y = (block.getY() + row) * gridCellSize;
 					
-					g.setColor(c);
-					g.fillRect(x, y, gridCellSize, gridCellSize);
-					g.setColor(Color.black);
-					g.drawRect(x, y, gridCellSize, gridCellSize);
+					drawGridSquare(g, c, x, y);
 				}
 			}
 		}
 	}
+	
+	private void drawBackground(Graphics g) {
+		Color color; // 백그라운드 블록에 대한 참조
+		
+		for(int r = 0; r < gridRows; r++) {
+			for(int c = 0; c < gridColumns; c++) {
+				color = background[r][c];
+				
+				// moveBlockToBackground 함수에서 컬러가 설정되면 not null
+				if(color != null) {
+					int x = c * gridCellSize;
+					int y = r * gridCellSize;
+					
+					drawGridSquare(g, color, x, y);
+				}
+				
+			}
+		}
+	}
+	
+	// 반복되는 코드는 모듈화!
+	private void drawGridSquare(Graphics g, Color c, int x, int y) {
+		g.setColor(c);
+		g.fillRect(x, y, gridCellSize, gridCellSize);
+		g.setColor(Color.black);
+		g.drawRect(x, y, gridCellSize, gridCellSize);
+	}
+	
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
+		drawBackground(g);
 		drawBlock(g);
-		
 	}
 }

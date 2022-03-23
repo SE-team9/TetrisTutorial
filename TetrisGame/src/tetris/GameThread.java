@@ -10,17 +10,17 @@ public class GameThread extends Thread {
 	@Override
 	public void run() {
 		
-		// 블록이 1초마다 1칸씩 떨어지도록 
+		// 블록이 1초마다 1칸씩 떨어지도록
 		while(true) {
-			try {
-				ga.moveBlockDown();
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			ga.spawnBlock(); // 새로운 블록 생성 
+			
+			while(ga.moveBlockDown()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		
 	}
-	
 }
