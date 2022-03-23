@@ -12,8 +12,29 @@ import java.awt.Dimension;
 
 public class GameForm extends JFrame {
 	private JPanel gameAreaPlaceholder;
+	private GameArea ga;
+	
 	private final static int WIDTH = 600;
 	private final static int HEIGHT = 450;
+	
+	// Create the frame.
+	public GameForm() {
+		gameAreaPlaceholder = new JPanel();
+		
+		gameAreaPlaceholder.setBounds(200, 0, 200, 400);
+		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
+		gameAreaPlaceholder.setLayout(null);
+		
+		ga = new GameArea(gameAreaPlaceholder, 10);
+		this.add(ga);
+		
+		startGame();
+	}
+	
+	// 게임 스레드 시작 
+	public void startGame() {
+		new GameThread(ga).start();
+	}
 
 	// Launch the application.
 	public static void main(String[] args) {
@@ -32,14 +53,5 @@ public class GameForm extends JFrame {
 		});
 	}
 
-	// Create the frame.
-	public GameForm() {
-		gameAreaPlaceholder = new JPanel();
-		
-		gameAreaPlaceholder.setBounds(200, 0, 200, 400);
-		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
-		gameAreaPlaceholder.setLayout(null);
-		
-		this.add(new GameArea(gameAreaPlaceholder, 10));
-	}
+	
 }
