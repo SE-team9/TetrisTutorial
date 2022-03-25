@@ -35,15 +35,130 @@ public class GameArea extends JPanel {
 	
 	public boolean moveBlockDown() {
 		// 블록이 바닥에 닿으면, 백그라운드 블록으로 전환 
-		if(checkBottom() == true) {
+		if(!checkBottom()) {
 			moveBlockToBackground();
 			return false;
 		}
 		
 		block.moveDown(); 
-		repaint(); // 일정한 시간 간격으로 (스레드 사용)
+		repaint(); // 일정한 시간 간격마다 업데이트 (스레드 사용)
+		// repaint 잊지 말자! (안 해주면 입력에 느리게 반응함)
 		
 		return true;
+	}
+	
+	public void moveBlockRight() {
+		if(!checkRight()) return;
+		
+		block.moveRight();
+		repaint();
+	}
+	
+	public void moveBlockLeft() {
+		if(!checkLeft()) return;
+		
+		block.moveLeft();
+		repaint();
+	}
+	
+	public void dropBlock() { // down
+		while(checkBottom()) {
+			block.moveDown();			
+		}
+		repaint();
+	}
+	
+	public void rotateBlock() { // up
+		block.rotate();
+		repaint();
+	}
+	
+	private boolean checkBottom() {
+		if(block.getBottomEdge() == gridRows) {
+			return false; // stop
+		}
+		
+		int[][] shape = block.getShape();
+		int w = block.getWidth();
+		int h = block.getHeight();
+		
+		for(int col = 0; col < w; col++) {
+			// 특정 열의 맨 밑에서 위쪽으로 올라가다가 
+			for(int row = h - 1; row >= 0; row--) {
+				// colored cell을 발견했고 
+				if(shape[row][col] != 0) { 
+					int x = col + block.getX();
+					int y = row + block.getY() + 1; // 해당 블록 바로 아래에!
+					
+					if(y < 0) break; // 보드판에 포함되지 않은 블록은 무시하고 다음 열로 이동 
+					
+					if(background[y][x] != null) { // 백그라운드 블록이 있으면!
+						return false; // stop
+					}
+					break; // 현재 열은 더이상 검사할 필요 없음.
+				}
+			}
+		}
+		
+		return true; // keep going
+	}
+	
+	private boolean checkLeft() {
+		if(block.getLeftEdge() == 0) {
+			return false; // stop
+		}
+		
+		int[][] shape = block.getShape();
+		int w = block.getWidth();
+		int h = block.getHeight();
+		
+		for(int row = 0; row < h; row++) {
+			for(int col = 0; col < w; col++) {
+				if(shape[row][col] != 0) { // colored cell
+					int x = col + block.getX() - 1; // 바로 왼쪽에!
+					int y = row + block.getY();
+					
+					if(x < 0) break; // 보드판 경계를 넘어가는 블록은 무시하고 다음 행으로 이동
+					
+					if(background[y][x] != null) { // 백그라운드 블록이 있으면!
+						return false; // stop
+					}
+					
+					break; // 현재 행은 더이상 검사할 필요 없음.
+				}
+			}
+		}
+		
+		return true; // keep going
+	}
+	
+	private boolean checkRight() {
+		if(block.getRightEdge() == gridColumns) {
+			return false; // stop
+		}
+		
+		int[][] shape = block.getShape();
+		int w = block.getWidth();
+		int h = block.getHeight();
+		
+		for(int row = 0; row < h; row++) {
+			for(int col = w - 1; col >= 0; col--) {
+				if(shape[row][col] != 0) { // colored cell
+					int x = col + block.getX() + 1; // 바로 오른쪽에!
+					int y = row + block.getY(); 
+					
+					if(x >= gridColumns) break; // 보드판 경계를 넘어가는 블록은 무시하고 다음 행으로 이동
+					
+					if(background[y][x] != null) { // 백그라운드 블록이 있으면!
+						return false; // stop
+					}
+					
+					break; // 현재 행은 더이상 검사할 필요 없음.
+				}
+			}
+		}
+		
+		return true; // keep going
 	}
 	
 	private void moveBlockToBackground() {
@@ -65,14 +180,6 @@ public class GameArea extends JPanel {
 				}
 			}
 		}
-	}
-	
-	private boolean checkBottom() {
-		if(block.getBottomEdge() == gridRows) {
-			return true;
-		}
-		
-		return false;
 	}
 	
 	private void drawBlock(Graphics g) {
