@@ -1,5 +1,6 @@
 package tetris;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 
@@ -20,10 +21,8 @@ public class GameForm extends JFrame {
 	
 	// Create the frame.
 	public GameForm() {
-		gameAreaPlaceholder = new JPanel();
-		gameAreaPlaceholder.setBounds(200, 0, 200, 400);
-		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
-		gameAreaPlaceholder.setLayout(null);
+		initThisFrame();
+		initGameAreaPlaceholder();
 		
 		ga = new GameArea(gameAreaPlaceholder, 10);
 		this.add(ga); // JFrame에 JPanel 추가하기
@@ -41,7 +40,8 @@ public class GameForm extends JFrame {
 		im.put(KeyStroke.getKeyStroke("RIGHT"), "right");
 		im.put(KeyStroke.getKeyStroke("LEFT"), "left");
 		im.put(KeyStroke.getKeyStroke("UP"), "up");
-		im.put(KeyStroke.getKeyStroke("DOWN"), "down");
+		im.put(KeyStroke.getKeyStroke("DOWN"), "downOneLine");
+		im.put(KeyStroke.getKeyStroke("ENTER"), "downToEnd");
 		
 		am.put("right", new AbstractAction() {
 			@Override
@@ -64,10 +64,17 @@ public class GameForm extends JFrame {
 			}
 		});
 		
-		am.put("down", new AbstractAction() {
+		am.put("downOneLine", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ga.dropBlock();
+					ga.moveBlockDown();
+			}
+		});
+		
+		am.put("downToEnd", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					ga.dropBlock();
 			}
 		});
 		
@@ -76,6 +83,24 @@ public class GameForm extends JFrame {
 	// 게임 스레드 시작 
 	public void startGame() {
 		new GameThread(ga).start();
+	}
+	
+	// 이 판넬 화면 설정
+	private void initThisFrame() {
+		this.setSize(600, 450);
+		this.setResizable(false);
+		this.setLayout(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLocationRelativeTo(null);
+		this.setVisible(false);
+	}
+	
+	//  게임 영역 화면 설정 
+	private void initGameAreaPlaceholder() {
+		gameAreaPlaceholder = new JPanel();
+		gameAreaPlaceholder.setBounds(200, 0, 200, 400);
+		gameAreaPlaceholder.setBackground(new Color(238, 238, 238));
+		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
 	}
 
 	// Launch the application.

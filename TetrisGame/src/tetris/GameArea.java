@@ -69,7 +69,21 @@ public class GameArea extends JPanel {
 	}
 	
 	public void rotateBlock() { // up
+		
+		// 배경과 겹치는지 확인
+		if (!checkRotate())
+			return;
+		
 		block.rotate();
+		
+		// 회전 시 위치 재설정
+		if (block.getLeftEdge() < 0)
+			block.setX(0);
+		if (block.getRightEdge() >= gridColumns)
+			block.setX(gridColumns - block.getWidth());
+		if (block.getBottomEdge() >= gridRows)
+			block.setY(gridRows - block.getHeight());
+		
 		repaint();
 	}
 	
@@ -118,7 +132,7 @@ public class GameArea extends JPanel {
 					int x = col + block.getX() - 1; // 바로 왼쪽에!
 					int y = row + block.getY();
 					
-					if(x < 0) break; // 보드판 경계를 넘어가는 블록은 무시하고 다음 행으로 이동
+					if(y < 0) break; // 보드판에 포함되지 않은 블록은 무시하고 다음 열로 이동
 					
 					if(background[y][x] != null) { // 백그라운드 블록이 있으면!
 						return false; // stop
@@ -147,7 +161,7 @@ public class GameArea extends JPanel {
 					int x = col + block.getX() + 1; // 바로 오른쪽에!
 					int y = row + block.getY(); 
 					
-					if(x >= gridColumns) break; // 보드판 경계를 넘어가는 블록은 무시하고 다음 행으로 이동
+					if(y < 0) break; // 보드판에 포함되지 않은 블록은 무시하고 다음 열로 이동
 					
 					if(background[y][x] != null) { // 백그라운드 블록이 있으면!
 						return false; // stop
@@ -161,6 +175,40 @@ public class GameArea extends JPanel {
 		return true; // keep going
 	}
 	
+	
+	// 회전 시 다른 블록과 겹치지 않도록 확인 (L모양 블럭에서 완전하진 않음 나중에 LShpae 블록은 따로 수정 필요)
+	private boolean checkRotate() {
+		// 복사객체를 생성하고 회전시켜서 확인한다. color부분은 나중에 필요없어지면 제거  
+		TetrisBlock rotated = new TetrisBlock(block.getShape(),block.getColor());
+		rotated.setCurrentRotation(block.getCurrentRotation());
+		rotated.setX(block.getX());
+		rotated.setY(block.getY());
+		rotated.rotate();
+		
+		if (rotated.getRightEdge() >= gridColumns)
+			rotated.setX(gridColumns - rotated.getWidth());
+
+		int[][] shape = rotated.getShape();
+		int w = rotated.getWidth();
+		int h = rotated.getHeight();
+
+		for (int row = 0; row < h; row++) {
+			for (int col = 0; col < w; col++) {
+				if (shape[row][col] != 0) {
+					// 해당 칸 확인
+					int x = col + rotated.getX();
+					int y = row + rotated.getY();
+					if (y < 0)
+						break;
+					if (background[y][x] != null)
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+
 	private void moveBlockToBackground() {
 		// 움직이고 있던 블록에 대한 참조
 		int[][] shape = block.getShape();
