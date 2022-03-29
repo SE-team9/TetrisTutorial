@@ -2,16 +2,8 @@ package tetris;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Random;
 
 import javax.swing.JPanel;
-
-import tetrisblocks.IShape;
-import tetrisblocks.JShape;
-import tetrisblocks.LShape;
-import tetrisblocks.OShape;
-import tetrisblocks.SShape;
-import tetrisblocks.ZShape;
 
 public class GameArea extends JPanel {
 	private int gridRows;
@@ -19,8 +11,6 @@ public class GameArea extends JPanel {
 	private int gridCellSize;
 	private Color[][] background;
 	private TetrisBlock block;
-	
-	private TetrisBlock[] blocks;
 	
 	public GameArea(JPanel placeholder, int columns) {
 		this.setBounds(placeholder.getBounds());
@@ -35,11 +25,7 @@ public class GameArea extends JPanel {
 		// HEIGHT divisible by grid-cell size
 		gridRows = this.getBounds().height / gridCellSize;
 		
-		// 각각의 블럭 종류
-		blocks = new TetrisBlock[] { new IShape(), new JShape(), new LShape(), new OShape(), new ZShape(),
-				new SShape() };
-
-		Random r = new Random();
+		background = new Color[gridRows][gridColumns];
 	}
 	
 	// 배경 초기화
@@ -47,10 +33,8 @@ public class GameArea extends JPanel {
 		background = new Color[gridRows][gridColumns];
 	}
 	
-	// 새 블럭 생성
 	public void spawnBlock() {
-		Random r = new Random();
-		block = blocks[r.nextInt(blocks.length)];
+		block = new TetrisBlock(new int[][] { {1, 0}, {1, 0}, {1, 1} }, Color.blue);
 		block.spawn(gridColumns);
 	}
 	
@@ -211,8 +195,8 @@ public class GameArea extends JPanel {
 	
 	// 회전 시 다른 블록과 겹치지 않도록 확인 (L모양 블럭에서 완전하진 않음 나중에 LShpae 블록은 따로 수정 필요)
 	private boolean checkRotate() {
-		// 복사객체를 생성하고 회전시켜서 확인한다.
-		TetrisBlock rotated = new TetrisBlock(block.getShape());
+		// 복사객체를 생성하고 회전시켜서 확인한다. color부분은 나중에 필요없어지면 제거  
+		TetrisBlock rotated = new TetrisBlock(block.getShape(),block.getColor());
 		rotated.setCurrentRotation(block.getCurrentRotation());
 		rotated.setX(block.getX());
 		rotated.setY(block.getY());
