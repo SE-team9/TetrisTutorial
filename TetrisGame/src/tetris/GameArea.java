@@ -28,15 +28,29 @@ public class GameArea extends JPanel {
 		background = new Color[gridRows][gridColumns];
 	}
 	
+	// 배경 초기화
+	public void initBackgroundArray() {
+		background = new Color[gridRows][gridColumns];
+	}
+	
 	public void spawnBlock() {
 		block = new TetrisBlock(new int[][] { {1, 0}, {1, 0}, {1, 1} }, Color.blue);
 		block.spawn(gridColumns);
 	}
 	
+	// 블럭이 위쪽 경계를 벗어 났으면 게임 종료
+	public boolean isBlockOutOfBounds() {
+		if (block.getY() < 0) {
+
+			block = null;
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean moveBlockDown() {
 		// 블록이 바닥에 닿으면, 백그라운드 블록으로 전환 
 		if(!checkBottom()) {
-			moveBlockToBackground();
 			return false;
 		}
 		
@@ -48,6 +62,8 @@ public class GameArea extends JPanel {
 	}
 	
 	public void moveBlockRight() {
+		
+		if (block == null) return;
 		if(!checkRight()) return;
 		
 		block.moveRight();
@@ -55,6 +71,7 @@ public class GameArea extends JPanel {
 	}
 	
 	public void moveBlockLeft() {
+		if (block == null) return;
 		if(!checkLeft()) return;
 		
 		block.moveLeft();
@@ -62,6 +79,7 @@ public class GameArea extends JPanel {
 	}
 	
 	public void dropBlock() { // down
+		if (block == null) return;
 		while(checkBottom()) {
 			block.moveDown();			
 		}
@@ -70,6 +88,7 @@ public class GameArea extends JPanel {
 	
 	public void rotateBlock() { // up
 		
+		if (block == null) return;
 		// 배경과 겹치는지 확인
 		if (!checkRotate())
 			return;
@@ -142,7 +161,6 @@ public class GameArea extends JPanel {
 				}
 			}
 		}
-		
 		return true; // keep going
 	}
 	
@@ -171,7 +189,6 @@ public class GameArea extends JPanel {
 				}
 			}
 		}
-		
 		return true; // keep going
 	}
 	
@@ -209,7 +226,7 @@ public class GameArea extends JPanel {
 	}
 	
 
-	private void moveBlockToBackground() {
+	public void moveBlockToBackground() {
 		// 움직이고 있던 블록에 대한 참조
 		int[][] shape = block.getShape();
 		int h = block.getHeight();
@@ -230,7 +247,58 @@ public class GameArea extends JPanel {
 		}
 	}
 	
+	// 완성된 줄들 삭제
+	public int clearLines() {
+
+		boolean lineFilled;
+		int linesCleared = 0;
+
+		// 아래부터
+		for (int r = gridRows - 1; r >= 0; r--) {
+			lineFilled = true;
+
+			for (int c = 0; c < gridColumns; c++) {
+				if (background[r][c] == null) {
+					lineFilled = false;
+					break;
+				}
+			}
+			if (lineFilled) {
+				linesCleared++;
+				clearLine(r);
+				shiftDown(r);
+				// 맨 윗 줄의 위는 null이므로 따로 지워준다.
+				clearLine(0);
+
+				// 아래로 한 줄 씩 내려왔으므로 지워진 줄 위치에서부터 다시 시작
+				r++;
+
+				repaint();
+			}
+		}
+		return linesCleared;
+	}
+
+	// 배경에서 r행 삭제 
+	private void clearLine(int r) {
+		for (int i = 0; i < gridColumns; i++) {
+			background[r][i] = null;
+		}
+	}
+
+	// 삭제된 r행 윗줄들을 내려준다.
+	private void shiftDown(int r) {
+		for (int row = r; row > 0; row--) {
+			for (int col = 0; col < gridColumns; col++) {
+				background[row][col] = background[row - 1][col];
+			}
+		}
+	}
+	
 	private void drawBlock(Graphics g) {
+		
+		if(block == null) return;
+		
 		int h = block.getHeight();
 		int w = block.getWidth();
 		Color c = block.getColor();
@@ -263,7 +331,6 @@ public class GameArea extends JPanel {
 					
 					drawGridSquare(g, color, x, y);
 				}
-				
 			}
 		}
 	}
