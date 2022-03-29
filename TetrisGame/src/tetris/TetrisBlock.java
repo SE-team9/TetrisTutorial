@@ -30,6 +30,7 @@ public class TetrisBlock {
 				}
 			}
 			
+			// 회전된 블록으로 2차원 배열 업데이트 
 			shape = shapes[i];
 		}
 		
