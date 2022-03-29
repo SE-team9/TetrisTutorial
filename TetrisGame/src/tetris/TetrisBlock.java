@@ -1,6 +1,7 @@
 package tetris;
 
 import java.awt.Color;
+import java.util.Random;
 
 public class TetrisBlock {
 	private int[][] shape;
@@ -9,9 +10,12 @@ public class TetrisBlock {
 	private int[][][] shapes;
 	private int currentRotation;
 	
-	public TetrisBlock(int[][] shape, Color color) {
+	// 블럭 색 지정에 사용할 변수들
+	private Color[] availableColors = {Color.green, Color.red, Color.blue, Color.orange, Color.yellow, Color.magenta, Color.pink};
+	private int colorNum;
+	
+	public TetrisBlock(int[][] shape) {
 		this.shape = shape;
-		this.color = color;
 		
 		initShapes();
 	}
@@ -32,21 +36,27 @@ public class TetrisBlock {
 			
 			shape = shapes[i];
 		}
-		
 	}
 	
 	public void spawn(int gridWidth) {
+		Random r =new Random();
+		
 		// x, y 위치 정하기 전에 블록 방향과 크기 먼저 초기화
-		currentRotation = 0;
+		// 랜덤하게 회전된 형태로 형태로 생성
+		currentRotation = r.nextInt(shapes.length);
 		shape = shapes[currentRotation];
 		
 		// 보드판 맨 윗줄의 가운데에서 새 블록이 떨어지도록
 		y = 0 - getHeight();
-		x = (gridWidth - getWidth()) / 2;
+		x = r.nextInt(gridWidth-getWidth());
+		
+		color = availableColors[this.getColorNum()];
 	}
 
 	public int[][] getShape() { return shape; }
 	public Color getColor() { return color; }
+	// 블럭 색 설정
+	public void setColor(int colorNum) { this.color = availableColors[colorNum]; }
 	
 	public int getHeight() { return shape.length; }
 	public int getWidth() { return shape[0].length; }
@@ -59,6 +69,10 @@ public class TetrisBlock {
 	// 회전 확인을 위해 추가한 함수
 	public int getCurrentRotation() { return currentRotation; }
 	public void setCurrentRotation(int newCurrentRotation) { currentRotation = newCurrentRotation; }
+	
+	// 블럭마다 정해진 색을 지정하기 위해 추가한 함수
+	public int getColorNum() { return colorNum; }
+	public void setColorNum(int newColorNum) { colorNum = newColorNum; }
 	
 	public void moveDown() { y++; }
 	public void moveLeft() { x--; }
