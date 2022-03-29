@@ -52,13 +52,7 @@ public class TetrisBlock {
 	public int getWidth() { return shape[0].length; }
 	
 	public int getX() { return x; }
-	public void setX(int newX) { x = newX; }
 	public int getY() { return y; }
-	public void setY(int newY) { y = newY; }
-	
-	// 회전 확인을 위해 추가한 함수
-	public int getCurrentRotation() { return currentRotation; }
-	public void setCurrentRotation(int newCurrentRotation) { currentRotation = newCurrentRotation; }
 	
 	public void moveDown() { y++; }
 	public void moveLeft() { x--; }
