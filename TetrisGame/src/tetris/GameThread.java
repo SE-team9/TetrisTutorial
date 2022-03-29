@@ -5,10 +5,10 @@ public class GameThread extends Thread {
 	private GameForm gf;
 	private int score;
 	private int level = 1;
-	private int scorePerLevel = 1;
+	private int scorePerLevel = 3;
 	
 	private int pause = 1000;
-	private int speedupPerLevel = 500;
+	private int speedupPerLevel = 100;
 	
 	public GameThread(GameArea ga, GameForm gf) {
 		this.ga = ga;
@@ -24,14 +24,7 @@ public class GameThread extends Thread {
 			
 			while(ga.moveBlockDown()) {
 				try {
-					
-					if(level > 1) {
-						Thread.sleep(pause);
-					}
-					
-					Thread.sleep(1000);
-					
-					
+					Thread.sleep(pause);	
 					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
