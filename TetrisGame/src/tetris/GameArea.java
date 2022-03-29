@@ -2,15 +2,20 @@ package tetris;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
 
 import javax.swing.JPanel;
+
+import tetrisblocks.*;
 
 public class GameArea extends JPanel {
 	private int gridRows;
 	private int gridColumns;
 	private int gridCellSize;
 	private Color[][] background;
+	
 	private TetrisBlock block;
+	private TetrisBlock[] blocks;
 	
 	public GameArea(JPanel placeholder, int columns) {
 		this.setBounds(placeholder.getBounds());
@@ -18,19 +23,25 @@ public class GameArea extends JPanel {
 		this.setBorder(placeholder.getBorder());
 		
 		gridColumns = columns;
-		
-		// WIDTH divisible by the numbers of columns
 		gridCellSize = this.getBounds().width / gridColumns;
-		
-		// HEIGHT divisible by grid-cell size
 		gridRows = this.getBounds().height / gridCellSize;
 		
 		background = new Color[gridRows][gridColumns];
+		
+		blocks = new TetrisBlock[] { new IShape(),
+									 new JShape(),
+									 new LShape(),
+									 new OShape(),
+									 new SShape(),
+									 new TShape(),
+									 new ZShape() };
 	}
 	
-	// 새로운 블록 생성
+	// 랜덤으로 새로운 블록 생성
 	public void spawnBlock() {
-		block = new TetrisBlock(new int[][] { {1, 0}, {1, 0}, {1, 1} }, Color.blue);
+		Random r = new Random();
+		
+		block = blocks[ r.nextInt(blocks.length) ];
 		block.spawn(gridColumns);
 	}
 	
@@ -68,7 +79,7 @@ public class GameArea extends JPanel {
 	public void moveBlockLeft() {
 		if(block == null) return;
 		
-		if(!checkLeft()) return;
+		if(checkLeft() == false) return;
 		
 		block.moveLeft();
 		repaint();
@@ -87,6 +98,20 @@ public class GameArea extends JPanel {
 		if(block == null) return;
 		
 		block.rotate();
+		
+		// 회전시킨 블록이 보드판 경계를 넘어가는 경우 예외 처리 
+		if(block.getLeftEdge() < 0) {
+			block.setX(0);
+		}
+		
+		if(block.getRightEdge() >= gridColumns) {
+			block.setX(gridColumns - block.getWidth());
+		}
+		
+		if(block.getBottomEdge() >= gridRows) {
+			block.setY(gridRows - block.getHeight());
+		}
+		
 		repaint();
 	}
 	

@@ -1,6 +1,7 @@
 package tetris;
 
 import java.awt.Color;
+import java.util.Random;
 
 public class TetrisBlock {
 	private int[][] shape;
@@ -9,10 +10,10 @@ public class TetrisBlock {
 	private int[][][] shapes;
 	private int currentRotation;
 	
-	public TetrisBlock(int[][] shape, Color color) {
+	private Color[] availableColors = { Color.green, Color.red, Color.blue };
+	
+	public TetrisBlock(int[][] shape) {
 		this.shape = shape;
-		this.color = color;
-		
 		initShapes();
 	}
 	
@@ -33,17 +34,20 @@ public class TetrisBlock {
 			// 회전된 블록으로 2차원 배열 업데이트 
 			shape = shapes[i];
 		}
-		
 	}
 	
 	public void spawn(int gridWidth) {
+		Random r = new Random();
+		
 		// x, y 위치 정하기 전에 블록 방향과 크기 먼저 초기화
-		currentRotation = 0;
+		currentRotation = r.nextInt(shapes.length);
 		shape = shapes[currentRotation];
 		
-		// 보드판 맨 윗줄의 가운데에서 새 블록이 떨어지도록
+		// 보드판 범위 내에서 랜덤한 위치에 새 블록이 떨어지도록 
 		y = 0 - getHeight();
-		x = (gridWidth - getWidth()) / 2;
+		x = r.nextInt(gridWidth - getWidth());
+		
+		color = availableColors[r.nextInt(availableColors.length)];
 	}
 
 	public int[][] getShape() { return shape; }
@@ -53,7 +57,9 @@ public class TetrisBlock {
 	public int getWidth() { return shape[0].length; }
 	
 	public int getX() { return x; }
+	public void setX(int x) { this.x = x; }
 	public int getY() { return y; }
+	public void setY(int y) { this.y = y; }
 	
 	public void moveDown() { y++; }
 	public void moveLeft() { x--; }
