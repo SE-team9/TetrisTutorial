@@ -45,7 +45,7 @@ public class StartupForm extends JFrame {
 		for (int i = 0; i < menuButtons.length; i++) {
 			menuButtons[i] = new JButton(menuNames[i]);
 			menuButtons[i].setBounds(center_horizontal, 250 + i * 40, 300, 30);
-			this.add(menuButtons[i]);
+			getContentPane().add(menuButtons[i]);
 		}
 		
 		menuButtons[0].addActionListener(new ActionListener() {
@@ -83,16 +83,6 @@ public class StartupForm extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					StartupForm frame = new StartupForm();
-					frame.setVisible(true);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		
 	}
 }

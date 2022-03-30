@@ -37,6 +37,7 @@ public class GameForm extends JFrame {
 		im.put(KeyStroke.getKeyStroke("LEFT"), "left");
 		im.put(KeyStroke.getKeyStroke("UP"), "up");
 		im.put(KeyStroke.getKeyStroke("DOWN"), "down");
+		im.put(KeyStroke.getKeyStroke("SPACE"), "space");
 		
 		am.put("right", new AbstractAction() {
 			@Override
@@ -63,6 +64,13 @@ public class GameForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ga.dropBlock();
+			}
+		});
+		
+		am.put("space", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Tetris.gameOver(1);
 			}
 		});
 		
@@ -110,7 +118,6 @@ public class GameForm extends JFrame {
 		});
 	}
 
-	
 	private void initThisFrame(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
