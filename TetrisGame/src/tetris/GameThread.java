@@ -13,6 +13,9 @@ public class GameThread extends Thread {
 	public GameThread(GameArea ga, GameForm gf) {
 		this.ga = ga;
 		this.gf = gf;
+		
+		gf.updateScore(score);
+		gf.updateLevel(level);
 	}
 
 	@Override
@@ -27,13 +30,15 @@ public class GameThread extends Thread {
 					Thread.sleep(pause);	
 					
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					// 메인 메뉴 버튼을 눌러서 GameThread가 인터럽트 되면 
+					// 이 run 함수가 완전히 종료되도록!
+					return; 
 				}
 			}
 			
 			// 블록이 보드판 경계를 넘어가면 게임 종료 
 			if(ga.isBlockOutOfBounds()) {
-				System.out.println("Game Over");
+				Tetris.gameOver(score);
 				break;
 			}
 			

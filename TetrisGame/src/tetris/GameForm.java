@@ -3,55 +3,29 @@ package tetris;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 public class GameForm extends JFrame {
-	private JPanel gameAreaPlaceholder;
-	private GameArea ga;
-	
 	private final static int WIDTH = 600;
 	private final static int HEIGHT = 450;
 	
-	private JLabel scoreDisplay;
-	private JLabel levelDisplay;
-//	private JTextArea keyDisplay;
+	private GameArea ga;	
+	private JPanel gameAreaPlaceholder;
+	private JLabel scoreDisplay, levelDisplay;
+	private JButton btnMainMenu;
+	private GameThread gt;
 	
 	// Create the frame.
 	public GameForm() {
-		initGameAreaPlaceholder();
-		initDisplay();
+		initComponents(); // ui 작업 처리
 		
 		ga = new GameArea(gameAreaPlaceholder, 10);
-		this.add(ga); // JFrame에 JPanel 추가하기
+		this.add(ga); // 프레임에 패널 추가하기
 		
 		initControls();
-		
-		startGame();
-	}
-	
-	// 게임 영역 화면 설정
-	private void initGameAreaPlaceholder() {
-		gameAreaPlaceholder = new JPanel();
-		gameAreaPlaceholder.setBounds(200, 0, 200, 400); // x, y, w, h
-		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
-		gameAreaPlaceholder.setLayout(null);
-	}
-
-	private void initDisplay() {
-		scoreDisplay = new JLabel("Score: 0");
-		scoreDisplay.setBounds(420, 10, 100, 30);
-		this.add(scoreDisplay);
-		
-		levelDisplay = new JLabel("Level: 0");
-		levelDisplay.setBounds(420, 40, 100, 30);
-		this.add(levelDisplay);
-
-//		keyDisplay = new JTextArea(" ← : 블럭 왼쪽 이동 \n → : 블럭 오른쪽 이동 \n"
-//				+ " ↓ : 블럭 아래 한 칸 이동\n ↑ : 블럭 회전\n Enter : 블럭 맨 아래 이동\n" + " ESC : 뒤로 가기\n");
-//		keyDisplay.setBounds(20, 210, 160, 120);
-//		this.add(keyDisplay);
 	}
 	
 	// key binding
@@ -96,7 +70,10 @@ public class GameForm extends JFrame {
 	
 	// 게임 스레드 시작 
 	public void startGame() {
-		new GameThread(ga, this).start();
+		ga.initBackgroundArray();
+		
+		gt = new GameThread(ga, this);
+		gt.start();
 	}
 	
 	public void updateScore(int score) {
@@ -108,23 +85,62 @@ public class GameForm extends JFrame {
 		
 	}
 	
-	// Launch the application.
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GameForm f = new GameForm();
-					f.setSize(WIDTH, HEIGHT);
-					f.setLayout(null);
-					f.setResizable(false);
-					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					f.setVisible(true);
+	private void initComponents() {
+		initThisFrame();
+		initGameAreaPlaceholder();
+		initDisplay();
+		
+		btnMainMenu = new JButton("Main Menu");
+		btnMainMenu.setBounds(20, 20, 100, 30);
+		this.add(btnMainMenu);
+		
+		btnMainMenu.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JButton btn = (JButton) e.getSource();
+				if(btn.getText().equals("Main Menu")) {
+					gt.interrupt(); // 현재 스레드가 완전히 종료되도록 
 					
-				} catch (Exception e) {
-					e.printStackTrace();
+					btn.setFocusable(false); // 메인 메뉴쪽으로 키 바인딩이 넘어가지 않도록  
+					
+					setVisible(false); // 현재 프레임 안 보이게 
+					Tetris.showStartup();
 				}
 			}
 		});
+	}
+
+	
+	private void initThisFrame(){
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(WIDTH, HEIGHT);
+		setLayout(null); // 이걸 설정 해줘야 setBounds 함수 인자대로 패널 크기가 조정됨. 
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setVisible(false);
+	}
+	
+	// 게임 영역 화면 설정
+	private void initGameAreaPlaceholder() {
+		gameAreaPlaceholder = new JPanel();
+		gameAreaPlaceholder.setBounds(200, 0, 200, 400); // x, y, w, h
+		gameAreaPlaceholder.setBorder(LineBorder.createBlackLineBorder());
+		gameAreaPlaceholder.setLayout(null);
+	}
+
+	private void initDisplay() {
+		scoreDisplay = new JLabel("Score: 0");
+		levelDisplay = new JLabel("Level: 1");
+		scoreDisplay.setBounds(420, 10, 100, 30);
+		levelDisplay.setBounds(420, 40, 100, 30);
+		
+		this.add(scoreDisplay);
+		this.add(levelDisplay);
+	}
+	
+	// Launch the application.
+	public static void main(String[] args) {
+		
 	}
 
 	

@@ -26,8 +26,6 @@ public class GameArea extends JPanel {
 		gridCellSize = this.getBounds().width / gridColumns;
 		gridRows = this.getBounds().height / gridCellSize;
 		
-		background = new Color[gridRows][gridColumns];
-		
 		blocks = new TetrisBlock[] { new IShape(),
 									 new JShape(),
 									 new LShape(),
@@ -35,6 +33,10 @@ public class GameArea extends JPanel {
 									 new SShape(),
 									 new TShape(),
 									 new ZShape() };
+	}
+	
+	public void initBackgroundArray() {
+		background = new Color[gridRows][gridColumns];
 	}
 	
 	// 랜덤으로 새로운 블록 생성
