@@ -258,6 +258,10 @@ public class GameArea extends JPanel {
 			}
 		}
 		
+		if(linesCleared > 0) {
+			Tetris.playClear();
+		}
+		
 		return linesCleared;
 	}
 	

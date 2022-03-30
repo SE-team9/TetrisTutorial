@@ -9,6 +9,8 @@ public class Tetris {
 	private static StartupForm sf;
 	private static LeaderboardForm lf;
 	
+	private static AudioPlayer audio = new AudioPlayer();
+	
 	public static void start() {
 		gf.setVisible(true);
 		gf.startGame();
@@ -24,12 +26,22 @@ public class Tetris {
 	
 	// 게임 종료되면 다이얼로그에서 이름 입력 받아서 점수와 함께 보여주기
 	public static void gameOver(int score) {
+		playGameover();
+		
 		String playerName = JOptionPane.showInputDialog("Game Over!\n Please enter your name.");
 		gf.setVisible(false);
 		
 		lf.addPlayer(playerName, score);
 	}
-
+	
+	public static void playClear() {
+		audio.playClearLine();
+	}
+	
+	public static void playGameover() {
+		audio.playGameover();
+	}
+	
 	public static void main(String[] args) {
 		
 		EventQueue.invokeLater(new Runnable() {
